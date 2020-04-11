@@ -21,6 +21,7 @@ function start() {
         message: "What would you like to do?",
         choices: [
           "View All Employees",
+          "View All Employees By Manager",
           "View Roles",
           "View Departments",
           "Add Employee",
@@ -34,6 +35,8 @@ function start() {
       switch (answer.action) {
         case "View All Employees":
           return viewEmployees();
+        case "View All Employees By Manager":
+          return viewEmployeesByManager();
         case "View Roles":
           return viewRoles();
         case "View Departments":
@@ -51,9 +54,29 @@ function start() {
 }
 
 function viewEmployees() {
-  db.getAllEmployeesDetails(employees => {
+  db.getAllEmployees(employees => {
     printTable(employees);
     start();
+  });
+}
+
+function viewEmployeesByManager() {
+  db.getManagers(managers => {
+    inquirer
+      .prompt([
+        {
+          name: "manager_id",
+          type: "list",
+          message: "Which manager do you want to view the employees of?",
+          choices: managers.map(man => ({ name: man.name, value: man.id }))
+        }
+      ])
+      .then(manager => {
+        db.getAllEmployeesByManager(manager, employees => {
+          printTable(employees);
+          start();
+        });
+      });
   });
 }
 
@@ -82,7 +105,10 @@ function addEmployee() {
           name: "manager_id",
           type: "list",
           message: "Who is the employee's manager?",
-          choices: results[1].map(emp => ({ name: emp.name, value: emp.id }))
+          choices: [
+            { name: "None", value: null },
+            ...results[1].map(emp => ({ name: emp.name, value: emp.id }))
+          ]
         }
       ])
       .then(employee => {
