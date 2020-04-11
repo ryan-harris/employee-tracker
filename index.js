@@ -10,13 +10,7 @@ const sql = new SqlConnection({
   database: "employees_db"
 });
 
-sql.connect(err => {
-  if (err) {
-    throw err;
-  }
-
-  return start();
-});
+sql.connect(() => start());
 
 function start() {
   inquirer
@@ -28,8 +22,9 @@ function start() {
         choices: [
           "View All Employees",
           "View Roles",
-          "Add Role",
           "View Departments",
+          "Add Employee",
+          "Add Role",
           "Add Department",
           "Exit"
         ]
@@ -41,10 +36,12 @@ function start() {
           return viewEmployees();
         case "View Roles":
           return viewRoles();
-        case "Add Role":
-          return addRole();
         case "View Departments":
           return viewDepartments();
+        case "Add Employee":
+          return addEmployee();
+        case "Add Role":
+          return addRole();
         case "Add Department":
           return addDepartment();
         default:
@@ -54,15 +51,52 @@ function start() {
 }
 
 function viewEmployees() {
-  sql.getAllEmployees(results => {
-    console.table(results);
+  sql.getAllEmployeesDetails(employees => {
+    printTable(employees);
     start();
   });
 }
 
+function addEmployee() {
+  sql.getRolesAndEmployees(results => {
+    inquirer
+      .prompt([
+        {
+          name: "first_name",
+          message: "What is the employee's first name?"
+        },
+        {
+          name: "last_name",
+          message: "What is the employee's last name?"
+        },
+        {
+          name: "role_id",
+          type: "list",
+          message: "What is the employee's role?",
+          choices: results[0].map(role => ({
+            name: role.title,
+            value: role.id
+          }))
+        },
+        {
+          name: "manager_id",
+          type: "list",
+          message: "Who is the employee's manager?",
+          choices: results[1].map(emp => ({ name: emp.name, value: emp.id }))
+        }
+      ])
+      .then(employee => {
+        sql.addEmployee(employee, res => {
+          console.log("Added employee to the database");
+          start();
+        });
+      });
+  });
+}
+
 function viewRoles() {
-  sql.getRoles(results => {
-    console.table(results);
+  sql.getRoles(roles => {
+    printTable(roles);
     start();
   });
 }
@@ -82,7 +116,7 @@ function addRole() {
         {
           name: "department_id",
           type: "list",
-          message: "Which department is the role apart of?",
+          message: "Which department is the role a part of?",
           choices: departments.map(dep => ({
             name: dep.department,
             value: dep.id
@@ -91,6 +125,7 @@ function addRole() {
       ])
       .then(role => {
         sql.addRole(role, res => {
+          console.log("Added role to the database");
           start();
         });
       });
@@ -98,8 +133,8 @@ function addRole() {
 }
 
 function viewDepartments() {
-  sql.getDepartments(results => {
-    console.table(results);
+  sql.getDepartments(departments => {
+    printTable(departments);
     start();
   });
 }
@@ -112,9 +147,15 @@ function addDepartment() {
         message: "What is the department name?"
       }
     ])
-    .then(answer => {
-      sql.addDepartment(answer.department, res => {
+    .then(department => {
+      sql.addDepartment(department, res => {
+        console.log("Added department to the database");
         start();
       });
     });
+}
+
+function printTable(table) {
+  console.log();
+  console.table(table);
 }
