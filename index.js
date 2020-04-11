@@ -28,6 +28,7 @@ function start() {
         choices: [
           "View All Employees",
           "View Roles",
+          "Add Role",
           "View Departments",
           "Add Department",
           "Exit"
@@ -40,6 +41,8 @@ function start() {
           return viewEmployees();
         case "View Roles":
           return viewRoles();
+        case "Add Role":
+          return addRole();
         case "View Departments":
           return viewDepartments();
         case "Add Department":
@@ -61,6 +64,36 @@ function viewRoles() {
   sql.getRoles(results => {
     console.table(results);
     start();
+  });
+}
+
+function addRole() {
+  sql.getDepartments(departments => {
+    inquirer
+      .prompt([
+        {
+          name: "title",
+          message: "What is the role title?"
+        },
+        {
+          name: "salary",
+          message: "What is the role's salary?"
+        },
+        {
+          name: "department_id",
+          type: "list",
+          message: "Which department is the role apart of?",
+          choices: departments.map(dep => ({
+            name: dep.department,
+            value: dep.id
+          }))
+        }
+      ])
+      .then(role => {
+        sql.addRole(role, res => {
+          start();
+        });
+      });
   });
 }
 
