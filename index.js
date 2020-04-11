@@ -29,6 +29,7 @@ function start() {
           "View All Employees",
           "View Roles",
           "View Departments",
+          "Add Department",
           "Exit"
         ]
       }
@@ -41,6 +42,8 @@ function start() {
           return viewRoles();
         case "View Departments":
           return viewDepartments();
+        case "Add Department":
+          return addDepartment();
         default:
           sql.disconnect();
       }
@@ -66,4 +69,19 @@ function viewDepartments() {
     console.table(results);
     start();
   });
+}
+
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        name: "department",
+        message: "What is the department name?"
+      }
+    ])
+    .then(answer => {
+      sql.addDepartment(answer.department, res => {
+        start();
+      });
+    });
 }
