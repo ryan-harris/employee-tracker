@@ -49,21 +49,21 @@ function start() {
 
 function viewEmployees() {
   sql.getAllEmployees(results => {
-    console.log(cTable.getTable(results));
+    console.table(results);
     start();
   });
 }
 
 function viewRoles() {
   sql.getRoles(results => {
-    console.log(cTable.getTable(results));
+    console.table(results);
     start();
   });
 }
 
 function viewDepartments() {
   sql.getDepartments(results => {
-    console.log(cTable.getTable(results));
+    console.table(results);
     start();
   });
 }
