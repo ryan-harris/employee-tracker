@@ -1,8 +1,8 @@
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-const SqlConnection = require("./lib/SqlConnection");
+const Database = require("./lib/Database");
 
-const sql = new SqlConnection({
+const db = new Database({
   host: "localhost",
   port: 3306,
   user: "root",
@@ -10,7 +10,7 @@ const sql = new SqlConnection({
   database: "employees_db"
 });
 
-sql.connect(() => start());
+db.connect(() => start());
 
 function start() {
   inquirer
@@ -45,20 +45,20 @@ function start() {
         case "Add Department":
           return addDepartment();
         default:
-          sql.disconnect();
+          db.disconnect();
       }
     });
 }
 
 function viewEmployees() {
-  sql.getAllEmployeesDetails(employees => {
+  db.getAllEmployeesDetails(employees => {
     printTable(employees);
     start();
   });
 }
 
 function addEmployee() {
-  sql.getRolesAndEmployees(results => {
+  db.getRolesAndEmployees(results => {
     inquirer
       .prompt([
         {
@@ -86,7 +86,7 @@ function addEmployee() {
         }
       ])
       .then(employee => {
-        sql.addEmployee(employee, res => {
+        db.addEmployee(employee, res => {
           console.log("Added employee to the database");
           start();
         });
@@ -95,14 +95,14 @@ function addEmployee() {
 }
 
 function viewRoles() {
-  sql.getRoles(roles => {
+  db.getRoles(roles => {
     printTable(roles);
     start();
   });
 }
 
 function addRole() {
-  sql.getDepartments(departments => {
+  db.getDepartments(departments => {
     inquirer
       .prompt([
         {
@@ -124,7 +124,7 @@ function addRole() {
         }
       ])
       .then(role => {
-        sql.addRole(role, res => {
+        db.addRole(role, res => {
           console.log("Added role to the database");
           start();
         });
@@ -133,7 +133,7 @@ function addRole() {
 }
 
 function viewDepartments() {
-  sql.getDepartments(departments => {
+  db.getDepartments(departments => {
     printTable(departments);
     start();
   });
@@ -148,7 +148,7 @@ function addDepartment() {
       }
     ])
     .then(department => {
-      sql.addDepartment(department, res => {
+      db.addDepartment(department, res => {
         console.log("Added department to the database");
         start();
       });
