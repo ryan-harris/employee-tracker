@@ -22,6 +22,7 @@ function start() {
         choices: [
           "View All Employees",
           "View All Employees By Manager",
+          "View All Employees By Department",
           "View Roles",
           "View Departments",
           "Add Employee",
@@ -37,6 +38,8 @@ function start() {
           return viewEmployees();
         case "View All Employees By Manager":
           return viewEmployeesByManager();
+        case "View All Employees By Department":
+          return viewEmployeesByDepartment();
         case "View Roles":
           return viewRoles();
         case "View Departments":
@@ -74,6 +77,33 @@ function viewEmployeesByManager() {
       .then(manager => {
         db.getAllEmployeesByManager(manager, employees => {
           printTable(employees);
+          start();
+        });
+      });
+  });
+}
+
+function viewEmployeesByDepartment() {
+  db.getDepartments(departments => {
+    inquirer
+      .prompt([
+        {
+          name: "department_id",
+          type: "list",
+          message: "Which department do you want to view the employees of?",
+          choices: departments.map(dep => ({
+            name: dep.department,
+            value: dep.id
+          }))
+        }
+      ])
+      .then(department => {
+        db.getAllEmployeesByDepartment(department, employees => {
+          if (employees.length > 0) {
+            printTable(employees);
+          } else {
+            console.log("There are no employees in that department");
+          }
           start();
         });
       });
