@@ -1,14 +1,14 @@
 USE employees_db;
 
 -- DEPARTMENT SEEDING
-INSERT INTO department (name)
+INSERT INTO departments (department)
 VALUES ("Sales"),
 ("Finance"),
 ("Engineering"),
 ("Legal");
 
 -- ROLE SEEDING
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES ("Sales Lead", 100000, 1),
 ("Salesperson", 80000, 1),
 ("Accountant", 120000, 2),
@@ -19,14 +19,14 @@ VALUES ("Sales Lead", 100000, 1),
 ("Lawyer", 195000, 4);
 
 -- EMPLOYEE SEEDING
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES ("John", "Barnes", 4, null),
-("Mary", "Torres", 1, null),
-("Zach", "Johnson", 2, 2),
 ("Gregory", "Miller", 5, 1),
-("Lori", "Morris", 6, 1),
+("Mary", "Torres", 1, null),
+("Zach", "Johnson", 2, 3),
+("Lori", "Morris", 6, null),
 ("Maria", "Peterson", 3, null),
 ("Brandon", "Lewis", 5, 1),
-("Susan", "Edwards", 2, 2),
+("Susan", "Edwards", 2, 3),
 ("Scott", "Walker", 7, null),
 ("Billy", "Lopez", 8, 9);
