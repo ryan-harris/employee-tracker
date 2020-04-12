@@ -9,10 +9,12 @@ const actions = [
     value: viewEmployeesByDepartment
   },
   { name: "View All Employees By Manager", value: viewEmployeesByManager },
-  { name: "View Roles", value: viewRoles },
-  { name: "View Departments", value: viewDepartments },
   { name: "Add Employee", value: addEmployee },
+  { name: "Update Employee Role", value: updateEmployeeRole },
+  { name: "Update Employee Manager", value: updateEmployeeManager },
+  { name: "View Roles", value: viewRoles },
   { name: "Add Role", value: addRole },
+  { name: "View Departments", value: viewDepartments },
   { name: "Add Department", value: addDepartment },
   { name: "Exit", value: exit }
 ];
@@ -92,7 +94,7 @@ function viewEmployeesByDepartment() {
           if (employees.length > 0) {
             printTable(employees);
           } else {
-            console.log("There are no employees in that department");
+            console.log("There are no employees in that department.");
           }
           start();
         });
@@ -133,9 +135,76 @@ function addEmployee() {
       ])
       .then(employee => {
         dbc.addEmployee(employee, res => {
-          console.log("Added employee to the database");
+          console.log("Added employee to the database.");
           start();
         });
+      });
+  });
+}
+
+function updateEmployeeRole() {
+  dbc.getRolesAndEmployees(results => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which employee's role do you want to update?",
+          choices: results[1].map(emp => ({ name: emp.name, value: emp.id }))
+        },
+        {
+          name: "role_id",
+          type: "list",
+          message: "Which role do you want to give the selected employee?",
+          choices: results[0].map(role => ({
+            name: role.title,
+            value: role.id
+          }))
+        }
+      ])
+      .then(answers => {
+        dbc.updateEmployee(
+          { id: answers.id },
+          { role_id: answers.role_id },
+          res => {
+            console.log("Updated employee's role.");
+            start();
+          }
+        );
+      });
+  });
+}
+
+function updateEmployeeManager() {
+  dbc.getEmployees(employees => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which employee's manager do you want to update?",
+          choices: employees.map(emp => ({ name: emp.name, value: emp.id }))
+        },
+        {
+          name: "manager_id",
+          type: "list",
+          message:
+            "Which employee do you want to set as manager for the selected employee?",
+          choices: ans =>
+            employees
+              .filter(emp => emp.id !== ans.id)
+              .map(emp => ({ name: emp.name, value: emp.id }))
+        }
+      ])
+      .then(answers => {
+        dbc.updateEmployee(
+          { id: answers.id },
+          { manager_id: answers.manager_id },
+          res => {
+            console.log("Updated employee's manager.");
+            start();
+          }
+        );
       });
   });
 }
@@ -171,7 +240,7 @@ function addRole() {
       ])
       .then(role => {
         dbc.addRole(role, res => {
-          console.log("Added role to the database");
+          console.log("Added role to the database.");
           start();
         });
       });
@@ -195,7 +264,7 @@ function addDepartment() {
     ])
     .then(department => {
       dbc.addDepartment(department, res => {
-        console.log("Added department to the database");
+        console.log("Added department to the database.");
         start();
       });
     });
