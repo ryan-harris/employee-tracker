@@ -1,8 +1,23 @@
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-const Database = require("./lib/Database");
+const DatabaseConnection = require("./lib/DatabaseConnection");
 
-const db = new Database({
+const actions = [
+  { name: "View All Employees", value: viewEmployees },
+  {
+    name: "View All Employees By Department",
+    value: viewEmployeesByDepartment
+  },
+  { name: "View All Employees By Manager", value: viewEmployeesByManager },
+  { name: "View Roles", value: viewRoles },
+  { name: "View Departments", value: viewDepartments },
+  { name: "Add Employee", value: addEmployee },
+  { name: "Add Role", value: addRole },
+  { name: "Add Department", value: addDepartment },
+  { name: "Exit", value: exit }
+];
+
+const dbc = new DatabaseConnection({
   host: "localhost",
   port: 3306,
   user: "root",
@@ -10,7 +25,7 @@ const db = new Database({
   database: "employees_db"
 });
 
-db.connect(() => start());
+dbc.connect(() => start());
 
 function start() {
   inquirer
@@ -19,52 +34,27 @@ function start() {
         name: "action",
         type: "list",
         message: "What would you like to do?",
-        choices: [
-          "View All Employees",
-          "View All Employees By Manager",
-          "View All Employees By Department",
-          "View Roles",
-          "View Departments",
-          "Add Employee",
-          "Add Role",
-          "Add Department",
-          "Exit"
-        ]
+        choices: actions
       }
     ])
     .then(answer => {
-      switch (answer.action) {
-        case "View All Employees":
-          return viewEmployees();
-        case "View All Employees By Manager":
-          return viewEmployeesByManager();
-        case "View All Employees By Department":
-          return viewEmployeesByDepartment();
-        case "View Roles":
-          return viewRoles();
-        case "View Departments":
-          return viewDepartments();
-        case "Add Employee":
-          return addEmployee();
-        case "Add Role":
-          return addRole();
-        case "Add Department":
-          return addDepartment();
-        default:
-          db.disconnect();
-      }
+      answer.action();
     });
 }
 
+function exit() {
+  dbc.disconnect();
+}
+
 function viewEmployees() {
-  db.getAllEmployees(employees => {
+  dbc.getAllEmployees(employees => {
     printTable(employees);
     start();
   });
 }
 
 function viewEmployeesByManager() {
-  db.getManagers(managers => {
+  dbc.getManagers(managers => {
     inquirer
       .prompt([
         {
@@ -75,7 +65,7 @@ function viewEmployeesByManager() {
         }
       ])
       .then(manager => {
-        db.getAllEmployeesByManager(manager, employees => {
+        dbc.getAllEmployeesByManager(manager, employees => {
           printTable(employees);
           start();
         });
@@ -84,7 +74,7 @@ function viewEmployeesByManager() {
 }
 
 function viewEmployeesByDepartment() {
-  db.getDepartments(departments => {
+  dbc.getDepartments(departments => {
     inquirer
       .prompt([
         {
@@ -98,7 +88,7 @@ function viewEmployeesByDepartment() {
         }
       ])
       .then(department => {
-        db.getAllEmployeesByDepartment(department, employees => {
+        dbc.getAllEmployeesByDepartment(department, employees => {
           if (employees.length > 0) {
             printTable(employees);
           } else {
@@ -111,7 +101,7 @@ function viewEmployeesByDepartment() {
 }
 
 function addEmployee() {
-  db.getRolesAndEmployees(results => {
+  dbc.getRolesAndEmployees(results => {
     inquirer
       .prompt([
         {
@@ -142,7 +132,7 @@ function addEmployee() {
         }
       ])
       .then(employee => {
-        db.addEmployee(employee, res => {
+        dbc.addEmployee(employee, res => {
           console.log("Added employee to the database");
           start();
         });
@@ -151,14 +141,14 @@ function addEmployee() {
 }
 
 function viewRoles() {
-  db.getRoles(roles => {
+  dbc.getRoles(roles => {
     printTable(roles);
     start();
   });
 }
 
 function addRole() {
-  db.getDepartments(departments => {
+  dbc.getDepartments(departments => {
     inquirer
       .prompt([
         {
@@ -180,7 +170,7 @@ function addRole() {
         }
       ])
       .then(role => {
-        db.addRole(role, res => {
+        dbc.addRole(role, res => {
           console.log("Added role to the database");
           start();
         });
@@ -189,7 +179,7 @@ function addRole() {
 }
 
 function viewDepartments() {
-  db.getDepartments(departments => {
+  dbc.getDepartments(departments => {
     printTable(departments);
     start();
   });
@@ -204,7 +194,7 @@ function addDepartment() {
       }
     ])
     .then(department => {
-      db.addDepartment(department, res => {
+      dbc.addDepartment(department, res => {
         console.log("Added department to the database");
         start();
       });
