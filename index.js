@@ -15,6 +15,7 @@ const actions = [
   { name: "Remove Employee", value: removeEmployee },
   { name: "View Roles", value: viewRoles },
   { name: "Add Role", value: addRole },
+  { name: "Update Role Salary", value: updateRoleSalary },
   { name: "Remove Role", value: removeRole },
   { name: "View Departments", value: viewDepartments },
   { name: "Add Department", value: addDepartment },
@@ -264,6 +265,30 @@ function addRole() {
       .then(role => {
         dbc.addRole(role, res => {
           console.log("Added role to the database.");
+          start();
+        });
+      });
+  });
+}
+
+function updateRoleSalary() {
+  dbc.getRolesNamesIds(roles => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which role's salary do you want to update?",
+          choices: roles.map(role => ({ name: role.title, value: role.id }))
+        },
+        {
+          name: "salary",
+          message: "What salary do you want to give the selected role?"
+        }
+      ])
+      .then(answers => {
+        dbc.updateRole({ id: answers.id }, { salary: answers.salary }, res => {
+          console.log("Role's salary updated.");
           start();
         });
       });
