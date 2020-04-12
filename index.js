@@ -53,10 +53,7 @@ function exit() {
 }
 
 function viewEmployees() {
-  dbc.getAllEmployees(employees => {
-    printTable(employees);
-    start();
-  });
+  dbc.getAllEmployees(resultCb(printTable));
 }
 
 function viewEmployeesByManager() {
@@ -71,10 +68,7 @@ function viewEmployeesByManager() {
         }
       ])
       .then(manager => {
-        dbc.getAllEmployeesByManager(manager, employees => {
-          printTable(employees);
-          start();
-        });
+        dbc.getAllEmployeesByManager(manager, resultCb(printTable));
       });
   });
 }
@@ -94,14 +88,16 @@ function viewEmployeesByDepartment() {
         }
       ])
       .then(department => {
-        dbc.getAllEmployeesByDepartment(department, employees => {
-          if (employees.length > 0) {
-            printTable(employees);
-          } else {
-            console.log("There are no employees in that department.");
-          }
-          start();
-        });
+        dbc.getAllEmployeesByDepartment(
+          department,
+          resultCb(employees => {
+            if (employees.length > 0) {
+              printTable(employees);
+            } else {
+              console.log("There are no employees in that department.");
+            }
+          })
+        );
       });
   });
 }
@@ -138,10 +134,7 @@ function addEmployee() {
         }
       ])
       .then(employee => {
-        dbc.addEmployee(employee, res => {
-          console.log("Added employee to the database.");
-          start();
-        });
+        dbc.addEmployee(employee, resultCb("Added employee to the database."));
       });
   });
 }
@@ -170,10 +163,7 @@ function updateEmployeeRole() {
         dbc.updateEmployee(
           { id: answers.id },
           { role_id: answers.role_id },
-          res => {
-            console.log("Updated employee's role.");
-            start();
-          }
+          resultCb("Updated employee's role.")
         );
       });
   });
@@ -204,10 +194,7 @@ function updateEmployeeManager() {
         dbc.updateEmployee(
           { id: answers.id },
           { manager_id: answers.manager_id },
-          res => {
-            console.log("Updated employee's manager.");
-            start();
-          }
+          resultCb("Updated employee's manager.")
         );
       });
   });
@@ -225,19 +212,13 @@ function removeEmployee() {
         }
       ])
       .then(employee => {
-        dbc.removeEmployee(employee, res => {
-          console.log("Removed employee.");
-          start();
-        });
+        dbc.removeEmployee(employee, resultCb("Removed employee."));
       });
   });
 }
 
 function viewRoles() {
-  dbc.getRoles(roles => {
-    printTable(roles);
-    start();
-  });
+  dbc.getRoles(resultCb(printTable));
 }
 
 function addRole() {
@@ -263,10 +244,7 @@ function addRole() {
         }
       ])
       .then(role => {
-        dbc.addRole(role, res => {
-          console.log("Added role to the database.");
-          start();
-        });
+        dbc.addRole(role, resultCb("Added role to the database."));
       });
   });
 }
@@ -287,10 +265,11 @@ function updateRoleSalary() {
         }
       ])
       .then(answers => {
-        dbc.updateRole({ id: answers.id }, { salary: answers.salary }, res => {
-          console.log("Role's salary updated.");
-          start();
-        });
+        dbc.updateRole(
+          { id: answers.id },
+          { salary: answers.salary },
+          resultCb("Role's salary updated.")
+        );
       });
   });
 }
@@ -307,19 +286,13 @@ function removeRole() {
         }
       ])
       .then(role => {
-        dbc.removeRole(role, res => {
-          console.log("Role removed.");
-          start();
-        });
+        dbc.removeRole(role, resultCb("Role removed."));
       });
   });
 }
 
 function viewDepartments() {
-  dbc.getDepartments(departments => {
-    printTable(departments);
-    start();
-  });
+  dbc.getDepartments(resultCb(printTable));
 }
 
 function addDepartment() {
@@ -331,10 +304,10 @@ function addDepartment() {
       }
     ])
     .then(department => {
-      dbc.addDepartment(department, res => {
-        console.log("Added department to the database.");
-        start();
-      });
+      dbc.addDepartment(
+        department,
+        resultCb("Added department to the database.")
+      );
     });
 }
 
@@ -353,12 +326,22 @@ function removeDepartment() {
         }
       ])
       .then(department => {
-        dbc.removeDepartment(department, res => {
-          console.log("Department removed.");
-          start();
-        });
+        dbc.removeDepartment(department, resultCb("Department removed."));
       });
   });
+}
+
+function resultCb(handler) {
+  return res => {
+    if (res) {
+      if (typeof handler === "string") {
+        console.log(handler);
+      } else {
+        handler(res);
+      }
+    }
+    start();
+  };
 }
 
 function printTable(table) {
