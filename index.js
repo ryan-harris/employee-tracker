@@ -12,10 +12,13 @@ const actions = [
   { name: "Add Employee", value: addEmployee },
   { name: "Update Employee Role", value: updateEmployeeRole },
   { name: "Update Employee Manager", value: updateEmployeeManager },
+  { name: "Remove Employee", value: removeEmployee },
   { name: "View Roles", value: viewRoles },
   { name: "Add Role", value: addRole },
+  { name: "Remove Role", value: removeRole },
   { name: "View Departments", value: viewDepartments },
   { name: "Add Department", value: addDepartment },
+  { name: "Remove Department", value: removeDepartment },
   { name: "Exit", value: exit }
 ];
 
@@ -209,6 +212,26 @@ function updateEmployeeManager() {
   });
 }
 
+function removeEmployee() {
+  dbc.getEmployees(employees => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which employee do you want to remove?",
+          choices: employees.map(emp => ({ name: emp.name, value: emp.id }))
+        }
+      ])
+      .then(employee => {
+        dbc.removeEmployee(employee, res => {
+          console.log("Removed employee.");
+          start();
+        });
+      });
+  });
+}
+
 function viewRoles() {
   dbc.getRoles(roles => {
     printTable(roles);
@@ -247,6 +270,26 @@ function addRole() {
   });
 }
 
+function removeRole() {
+  dbc.getRolesNamesIds(roles => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which role do you want to remove?",
+          choices: roles.map(role => ({ name: role.title, value: role.id }))
+        }
+      ])
+      .then(role => {
+        dbc.removeRole(role, res => {
+          console.log("Role removed.");
+          start();
+        });
+      });
+  });
+}
+
 function viewDepartments() {
   dbc.getDepartments(departments => {
     printTable(departments);
@@ -268,6 +311,29 @@ function addDepartment() {
         start();
       });
     });
+}
+
+function removeDepartment() {
+  dbc.getDepartments(departments => {
+    inquirer
+      .prompt([
+        {
+          name: "id",
+          type: "list",
+          message: "Which department do you want to remove?",
+          choices: departments.map(dep => ({
+            name: dep.department,
+            value: dep.id
+          }))
+        }
+      ])
+      .then(department => {
+        dbc.removeDepartment(department, res => {
+          console.log("Department removed.");
+          start();
+        });
+      });
+  });
 }
 
 function printTable(table) {
