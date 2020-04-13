@@ -18,6 +18,10 @@ const actions = [
   { name: "Update Role Salary", value: updateRoleSalary },
   { name: "Remove Role", value: removeRole },
   { name: "View Departments", value: viewDepartments },
+  {
+    name: "View Total Budget of Department",
+    value: viewTotalBudgetOfDepartment
+  },
   { name: "Add Department", value: addDepartment },
   { name: "Remove Department", value: removeDepartment },
   { name: "Exit", value: exit }
@@ -293,6 +297,31 @@ function removeRole() {
 
 function viewDepartments() {
   dbc.getDepartments(resultCb(printTable));
+}
+
+function viewTotalBudgetOfDepartment() {
+  dbc.getDepartments(departments => {
+    inquirer
+      .prompt([
+        {
+          name: "department_id",
+          type: "list",
+          message: "Which department do you want to view the budget of?",
+          choices: departments.map(dep => ({
+            name: dep.department,
+            value: dep.id
+          }))
+        }
+      ])
+      .then(department => {
+        dbc.getDepartmentsBudget(
+          department,
+          resultCb(res => {
+            console.log(`Total budget: ${res[0].totalSalary.toLocaleString()}`);
+          })
+        );
+      });
+  });
 }
 
 function addDepartment() {
