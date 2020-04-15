@@ -97,7 +97,7 @@ class DatabaseConnection {
   }
 
   removeEmployee(employee, cb) {
-    this.runQuery(`DELETE FROM employees WHERE?`, employee, cb);
+    this.runQuery(`DELETE FROM employees WHERE ?`, employee, cb);
   }
 
   getRoles(cb) {
