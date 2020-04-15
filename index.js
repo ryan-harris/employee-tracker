@@ -2,6 +2,14 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 const DatabaseConnection = require("./lib/DatabaseConnection");
 
+const dbc = new DatabaseConnection({
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "password",
+  database: "employees_db"
+});
+
 const actions = [
   { name: "View All Employees", value: viewEmployees },
   {
@@ -26,14 +34,6 @@ const actions = [
   { name: "Remove Department", value: removeDepartment },
   { name: "Exit", value: exit }
 ];
-
-const dbc = new DatabaseConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "password",
-  database: "employees_db"
-});
 
 dbc.connect(() => start());
 
