@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-const DatabaseConnection = require("./lib/DatabaseConnection");
+const DatabaseConnection = require("./db");
 
 const dbc = new DatabaseConnection({
   host: "localhost",

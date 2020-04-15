@@ -19,7 +19,7 @@ To install the required dependencies, run `npm install`
 
 This project assumes there is a MySQL server running on localhost:3306. If your server is running somewhere else, or your root password isn't "password", you can edit `index.js` (lines 6-10) to reflect that.
 
-Run the provided file `sql/schema.sql` in MySQL Workbench to initialize the schema for this application. If you want to pre-populate the database with test values, run `sql/seed.sql` inside MySQL Workbench.
+Run the provided file `db/schema.sql` in MySQL Workbench to initialize the schema for this application. If you want to pre-populate the database with test values, run `db/seed.sql` inside MySQL Workbench.
 
 ## Usage
 
